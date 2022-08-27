@@ -6,7 +6,7 @@
 	#include<stdlib.h>
 	extern void yyerror(const char *);  /* prints grammar violation message */
 	static void comment(void);
-    extern int check_type(void);
+        extern int check_type(void);
 %}
 
 WS [\t\v\n\f]
@@ -18,8 +18,8 @@ L [a-zA-Z_]
 A [a-zA-Z_0-9]
 
 %%
-"/*" {comment();}
-"//".* {/*ignore comment*/}
+"/*"                 {comment();}
+"//".*               {/*ignore comment*/}
 "int"                {return INT;}
 "bool"               {return BOOL;}
 "long"               {return LONG;}
@@ -90,11 +90,11 @@ A [a-zA-Z_0-9]
 {NZ}{D}*              {return I_CONSTANT;}
 {D}+{E}{FS}?          {return F_CONSTANT;}
 {D}*"."{D}+{E}?{FS}?  {return F_CONSTANT;}
-{D}+"."{E}?{FS}?	  {return F_CONSTANT;}
+{D}+"."{E}?{FS}?      {return F_CONSTANT;}
 \"(\\.|[^"\\])*\"     {return STRING_LITERAL;}
 [L]+[A]*              {return IDENTIFIER;}
-{WS}+ {/*ignore whitespace*/}
-. {/*ignore bad character*/}
+{WS}+                 {/*ignore whitespace*/}
+.                     {/*ignore bad character*/}
 %%
 
 static void comment(void){
