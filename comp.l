@@ -4,12 +4,12 @@
 	#include<calc.tab.h>
 	#include<stdio.h>
 	#include<stdlib.h>
-    #include"sytab.c"
+        #include"sytab.c"
 	extern void yyerror(const char *);  /* prints grammar violation message */
 	static void comment(void);
-    extern int lineno;
-    extern FILE *yyin;
-    extern FILE *yyout;
+        extern int lineno;
+        extern FILE *yyin;
+        extern FILE *yyout;
 %}
 
 WS [ \t\r\f]
@@ -93,7 +93,7 @@ A [a-zA-Z_0-9]
 "0"|{NZ}{D}*          {return I_CONSTANT;}
 {D}+{E}{FS}?          {return F_CONSTANT;}
 {D}*"."{D}+{E}?{FS}?  {return F_CONSTANT;}
-{D}+"."{E}?{FS}?	  {return F_CONSTANT;}
+{D}+"."{E}?{FS}?      {return F_CONSTANT;}
 \"(\\.|[^"\\])*\"     {return STRING_LITERAL;}
 [L]+[A]*              {insert(yytext, strlen(yytext), UNDEF, lineno);return IDENTIFIER;}
 {WS}+                 {/*ignore whitespace*/}
