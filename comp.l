@@ -4,12 +4,15 @@
 	#include<calc.tab.h>
 	#include<stdio.h>
 	#include<stdlib.h>
+    #include"sytab.c"
 	extern void yyerror(const char *);  /* prints grammar violation message */
 	static void comment(void);
-        extern int check_type(void);
+    extern int lineno;
+    extern FILE *yyin;
+    extern FILE *yyout;
 %}
 
-WS [\t\v\n\f]
+WS [ \t\r\f]
 D [0-9]
 E ([Ee][+-]?{D}+)
 FS  (f|F|l|L)
@@ -87,14 +90,15 @@ A [a-zA-Z_0-9]
 ">>="                 {return RIGHT_ASSIGN;}
 "<<"                  {return LEFT_OP;}
 ">>"                  {return RIGHT_OP;}
-{NZ}{D}*              {return I_CONSTANT;}
+"0"|{NZ}{D}*          {return I_CONSTANT;}
 {D}+{E}{FS}?          {return F_CONSTANT;}
 {D}*"."{D}+{E}?{FS}?  {return F_CONSTANT;}
-{D}+"."{E}?{FS}?      {return F_CONSTANT;}
+{D}+"."{E}?{FS}?	  {return F_CONSTANT;}
 \"(\\.|[^"\\])*\"     {return STRING_LITERAL;}
-[L]+[A]*              {return IDENTIFIER;}
+[L]+[A]*              {insert(yytext, strlen(yytext), UNDEF, lineno);return IDENTIFIER;}
 {WS}+                 {/*ignore whitespace*/}
-.                     {/*ignore bad character*/}
+"\n"                  {lineno++;}
+.                     {yyerror("unrecognized character");}
 %%
 
 static void comment(void){
@@ -109,4 +113,28 @@ static void comment(void){
                 break;
         }
     yyerror("unterminated comment");
+}
+
+extern void yyerror(const char *message){
+    printf("Error: \"%s\" in line %d. Token = %s\n", message, lineno, yytext);
+    exit(1);
+}
+
+int main(int argc, char *argv[]){
+   // initialize symbol table
+    init_hash_table();
+ 
+    // open input file
+    yyin = fopen(argv[1], "r");
+    
+    // lexical analysis
+    yylex();
+    fclose(yyin);
+    
+    // symbol table dump
+    yyout = fopen("symtab_dump.out", "w");
+    symtab_dump(yyout);
+    fclose(yyout);  
+    
+    return 0;
 }
