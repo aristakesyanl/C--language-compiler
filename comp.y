@@ -4,11 +4,11 @@
 	#include<ast.h>
 	#include<stdio.h>
 	#include<stdlib.h>
-    #include"sytab.h"
-    #include<string.h>
-    #include"ast.h"
-    extern int yylex();
-    int flag=-1;
+        #include"sytab.h"
+        #include<string.h>
+        #include"ast.h"
+        extern int yylex();
+        int flag=-1;
 %}
 
 %right '=' MUL_ASSIGN ADD_ASSIGN SUB_ASSIGN DIV_ASSIGN MOD_ASSIGN AND_ASSIGN OR_ASSIGN XOR_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN
@@ -23,13 +23,14 @@
 
 %token INT BOOL LONG SHORT LONGLONG FLOAT DOUBLE CHAR VOID
 %token CONST
-%token IF ELSE WHILE FOR DO SWITCH CASE DEFAULT
-%token EXETRN STATIC
+%token IF ELSE WHILE FOR DO 
+%token EXTERN STATIC
 %token CLASS PUBLIC PRIVATE
 %token SWITCH CASE DEFAULT CONTINUE BREAK RETURN
 %token EQ NOT_EQ LE_OP GE_OP
 %token AND_OP
 %token OR_OP
+%token INC_OP DEC_OP
 %token LEFT_OP RIGHT_OP
 %token MUL_ASSIGN ADD_ASSIGN SUB_ASSIGN DIV_ASSIGN MOD_ASSIGN AND_ASSIGN OR_ASSIGN XOR_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN
 %token I_CONSTANT F_CONSTANT STRING_LITERAL IDENTIFIER
@@ -72,9 +73,9 @@ constant
 
 unary_expression
 	:INC_OP unary_expression
-	|DEC-OP unary_expression
+	|DEC_OP unary_expression
 	|unary_operator cast_expression
-	|postfix_expresssion
+	|postfix_expression
 	;
 
 unary_operator
@@ -89,9 +90,10 @@ cast_expression
 	|'(' type_specifier ')' cast_expression
 	;
 
-postfix_expresssion
+postfix_expression
 	:primary_expression
 	|postfix_expression '[' expression ']'
+	|postfix_expression '(' ')'
 	|postfix_expression '(' argument_list ')'
 	|postfix_expression INC_OP
 	|postfix_expression DEC_OP
@@ -99,8 +101,7 @@ postfix_expresssion
 	;
 
 argument_list
-	:/*empty*/
-	|expression
+	:expression
 	|argument_list ',' expression
 	;
 
@@ -148,7 +149,6 @@ assignment_operator
 	|XOR_ASSIGN
 	;
 
-
 declaration
 	:declaration_qualifier type_qualifier type_specifier direct_declarator '=' initializer
 	;
@@ -174,14 +174,13 @@ initializer
 	{if(flag==0){yyerror("array cannot be initialized as variable");}}
 	;
 
-
 statement
 	:labeled_statement
-	|compound_statement
 	|expression_statement
 	|selection_statement
 	|iteration_statement
 	|jump_statement
+	|compound_statement
 	;
 
 labeled_statement
@@ -189,6 +188,28 @@ labeled_statement
 	|DEFAULT ':' statement
 	;
 
+expression_statement
+	:';'
+	|assignment_expression ';'
+	;
+selection_statement
+	:IF '('relational_expression ')' statement
+	|IF '('relational_expression ')' statement ELSE statement 
+	|SWITCH '(' expression ')' statement 
+	;
+
+iteration_statement
+	:WHILE '(' relational_expression ')' statement 
+	|DO statement WHILE '(' relational_expression ')' statement ';'
+	|FOR '(' assignment_expression ';' relational_expression ';' expression ')'
+	;
+
+jump_statement
+	:CONTINUE ';'
+	|BREAK ';'
+	|RETURN ';'
+	|RETURN expression ';' 
+	;
 
 compound_statement
 	:'{' '}'
@@ -197,52 +218,26 @@ compound_statement
 
 block_item_list
 	:block_item
-	|block_item_list block_item_list;
+	|block_item_list block_item;
 
 block_item
-	:declaration
+	:declaration ';'
 	|statement
 	;
-expression_statement
-	:';'
-	|expression ';'
-	|assignment_expression ';'
-	|logical_expression ';'
-	;
-
-selection_statement
-	:IF '('relational_expression ')' statement
-	|IF '('relational_expression ')' statement ELSE statement 
-	|SWITCH '(' expression ')' statement 
-	;
-
-jump_statement
-	:CONTINUE;
-	|BREAK;
-	|RETURN;
-	|RETURN expression 
-	;
-
-iteration_statement
-	:WHILE '(' logical_expression ')' statement 
-	|DO statement WHILE '(' logical_expression ')' statement ';'
-	|FOR '(' assignment_expression ';' logical_expression ';' expression ')'
-	;
-
 
 program
-	;external_declaration
+	:external_declaration
 	|program external_declaration
 	;
 
 external_declaration
-	:declaration 
+	:declaration ';'
 	|function_definition
 	|class_definition
 	;
 
 function_definition
-	:declaration_qualifier type_qualifier type_specifier IDENTIFIER '(' argument_list ')' compount_statement
+	:declaration_qualifier type_qualifier type_specifier IDENTIFIER '(' argument_list ')' compound_statement
 	;
 
 class_definition
@@ -258,9 +253,8 @@ class_block_item_list
 	|PRIVATE ':' class_block_item_list
 	|PUBLIC ':' class_block_item_list
 	|function_definition class_block_item_list
-	|class_definition class_block_item_list
-	;
-
+	|declaration ';' class_block_item_list
+	;	
 %%
 
 void yyerror(const char *message){
