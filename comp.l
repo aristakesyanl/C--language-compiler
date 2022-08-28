@@ -1,15 +1,15 @@
-%option noyywrite nodefault
+%option noyywrap nodefault
 %{
-	#include<ast.h>
-	#include<calc.tab.h>
-	#include<stdio.h>
-	#include<stdlib.h>
-        #include"sytab.c"
-	extern void yyerror(const char *);  /* prints grammar violation message */
+	#include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+    #include "symtab.h"
+    #include "comp.tab.h"
+    extern FILE *yyin;
+    extern FILE *yyout;
+    int lineno = 1;
+    void yyerror();
 	static void comment(void);
-        extern int lineno;
-        extern FILE *yyin;
-        extern FILE *yyout;
 %}
 
 WS [ \t\r\f]
@@ -27,7 +27,7 @@ A [a-zA-Z_0-9]
 "bool"               {return BOOL;}
 "long"               {return LONG;}
 "short"              {return SHORT;}
-"long long"          {return LONG LONG;}
+"long long"          {return LONGLONG;}
 "float"              {return FLOAT;}
 "double"             {return DOUBLE;}
 "char"               {return CHAR;}
@@ -38,7 +38,6 @@ A [a-zA-Z_0-9]
 "while"              {return WHILE;}
 "for"                {return FOR;}
 "do"                 {return DO;}
-"sizeof"             {return SIZEOF;}
 "extern"             {return EXTERN;}
 "static"             {return STATIC;}
 "class"              {return CLASS;}
@@ -50,15 +49,14 @@ A [a-zA-Z_0-9]
 "continue"           {return CONTINUE;}
 "break"              {return BREAK;}
 "return"             {return RETURN;}
-"+" |
-"-" |
-"*" |
-"/" |
-"|" |
-"(" |
-")" |
-"%" |
-"|" |
+"+" |                
+"-" |                
+"*" |                
+"/" |                
+"|" |                
+"(" |                
+")" |                
+"%" |                
 "&" |
 "!" |
 "~" |
@@ -72,8 +70,8 @@ A [a-zA-Z_0-9]
 ","                   {return yytext[0];}
 "=="                  {return EQ;}
 "!="                  {return NOT_EQ;}
-"<="                  {return LE;}
-">="                  {return GE;}
+"<="                  {return LE_OP;}
+">="                  {return GE_OP;}
 "++"                  {return INC_OP;}
 "--"                  {return DEC_OP;}
 "&&"                  {return AND_OP;}
@@ -93,7 +91,7 @@ A [a-zA-Z_0-9]
 "0"|{NZ}{D}*          {return I_CONSTANT;}
 {D}+{E}{FS}?          {return F_CONSTANT;}
 {D}*"."{D}+{E}?{FS}?  {return F_CONSTANT;}
-{D}+"."{E}?{FS}?      {return F_CONSTANT;}
+{D}+"."{E}?{FS}?	  {return F_CONSTANT;}
 \"(\\.|[^"\\])*\"     {return STRING_LITERAL;}
 [L]+[A]*              {insert(yytext, strlen(yytext), UNDEF, lineno);return IDENTIFIER;}
 {WS}+                 {/*ignore whitespace*/}
@@ -113,28 +111,4 @@ static void comment(void){
                 break;
         }
     yyerror("unterminated comment");
-}
-
-extern void yyerror(const char *message){
-    printf("Error: \"%s\" in line %d. Token = %s\n", message, lineno, yytext);
-    exit(1);
-}
-
-int main(int argc, char *argv[]){
-   // initialize symbol table
-    init_hash_table();
- 
-    // open input file
-    yyin = fopen(argv[1], "r");
-    
-    // lexical analysis
-    yylex();
-    fclose(yyin);
-    
-    // symbol table dump
-    yyout = fopen("symtab_dump.out", "w");
-    symtab_dump(yyout);
-    fclose(yyout);  
-    
-    return 0;
 }
