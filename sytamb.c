@@ -2,22 +2,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include "symtab.h"
- 
+
+/* current scope */
+int cur_scope = 0;
+
 void init_hash_table(){
-    hash_table=malloc(SIZE*sizeof(list_t*));
-    for(int i=0; i<SIZE; i++) hash_table[i]=NULL;
+    int i; 
+    hash_table = malloc(SIZE * sizeof(list_t*));
+    for(i = 0; i < SIZE; i++) hash_table[i] = NULL;
 }
- 
-/*hashing function*/ 
+
 unsigned int hash(char *key){
-    unsigned int hashval=0;
+    unsigned int hashval = 0;
     for(;*key!='\0';key++) hashval += *key;
     hashval += key[0] % 11 + (key[0] << 3) - key[0];
     return hashval % SIZE;
 }
- 
+
 void insert(char *name, int len, int type, int lineno){
-    unsigned int hashval=hash(name);
+    unsigned int hashval = hash(name);
     list_t *l = hash_table[hashval];
     
     while ((l != NULL) && (strcmp(name,l->st_name) != 0)) l = l->next;
@@ -48,29 +51,29 @@ void insert(char *name, int len, int type, int lineno){
         printf("Found %s again at line %d!\n", name, lineno);
     }
 }
- 
+
 list_t *lookup(char *name){ /* return symbol if found or NULL if not found */
     unsigned int hashval = hash(name);
     list_t *l = hash_table[hashval];
     while ((l != NULL) && (strcmp(name,l->st_name) != 0)) l = l->next;
     return l; // NULL is not found
 }
- 
+
 list_t *lookup_scope(char *name, int scope){ /* return symbol if found or NULL if not found */
     unsigned int hashval = hash(name);
     list_t *l = hash_table[hashval];
     while ((l != NULL) && (strcmp(name,l->st_name) != 0) && (scope != l->scope)) l = l->next;
     return l; // NULL is not found
 }
- 
+
 void hide_scope(){ /* hide the current scope */
     if(cur_scope > 0) cur_scope--;
 }
- 
+
 void incr_scope(){ /* go to next scope */
     cur_scope++;
 }
- 
+
 /* print to stdout by default */ 
 void symtab_dump(FILE * of){  
   int i;
