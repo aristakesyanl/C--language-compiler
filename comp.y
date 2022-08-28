@@ -159,7 +159,7 @@ declaration_qualifier
 	|STATIC
 	;
 
-direct_declarator:
+direct_declarator
 	:IDENTIFIER {flag=0;}
 	|direct_declarator '[' expression ']' {flag=1;}
 	;
