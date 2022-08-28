@@ -1,9 +1,9 @@
 /* maximum size of hash table */
 #define SIZE 211
- 
+
 /* maximum size of tokens-identifiers */
 #define MAXTOKENLEN 40
- 
+
 /* token types */
 #define UNDEF 0
 #define INT_TYPE 1
@@ -13,14 +13,11 @@
 #define ARRAY_TYPE 5
 #define FUNCTION_TYPE 6
 #define CLASS_TYPE 7
- 
+
 /* how parameter is passed */
 #define BY_VALUE 1
 #define BY_REFER 2
- 
-/* current scope */
-int cur_scope = 0;
- 
+
 /* parameter struct */
 typedef struct Param{
     int par_type;
@@ -29,14 +26,14 @@ typedef struct Param{
     int ival; double fval; char *st_sval;
     int passing; // value or reference
 }Param;
- 
+
 /* a linked list of references (lineno's) for each variable */
 typedef struct RefList{ 
     int lineno;
     struct RefList *next;
     int type;
 }RefList;
- 
+
 // struct that represents a list node
 typedef struct list_t{
     char st_name[MAXTOKENLEN];
@@ -57,10 +54,10 @@ typedef struct list_t{
     // pointer to next item in the list
     struct list_t *next;
 }list_t;
- 
+
 /* the hash table */
 static list_t **hash_table;
- 
+
 // Function Declarations
 void init_hash_table(); // initialize hash table
 unsigned int hash(char *key); // hash function 
