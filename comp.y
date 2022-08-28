@@ -1,14 +1,13 @@
 %{
-	/*first without classes*/
-	/*don't forget to add classes later*/
-	#include<ast.h>
-	#include<stdio.h>
-	#include<stdlib.h>
-        #include"sytab.h"
-        #include<string.h>
-        #include"ast.h"
-        extern int yylex();
-        int flag=-1;
+	#include "symtab.c"
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <string.h>
+	extern FILE *yyin;
+	extern FILE *yyout;
+	extern int lineno;
+	extern int yylex();
+	void yyerror();
 %}
 
 %right '=' MUL_ASSIGN ADD_ASSIGN SUB_ASSIGN DIV_ASSIGN MOD_ASSIGN AND_ASSIGN OR_ASSIGN XOR_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN
@@ -160,18 +159,15 @@ declaration_qualifier
 	;
 
 direct_declarator
-	:IDENTIFIER {flag=0;}
-	|direct_declarator '[' expression ']' {flag=1;}
+	:IDENTIFIER 
+	|direct_declarator '[' expression ']' 
 	;
 
 
 initializer
 	:expression
-	{if(flag==1){yyerror("variable cannot be initialized as an array");}}
 	|'{' '}'
-	{if(flag==0){yyerror("array cannot be initialized as variable");}}
 	| '{' argument_list '}'
-	{if(flag==0){yyerror("array cannot be initialized as variable");}}
 	;
 
 statement
@@ -257,9 +253,10 @@ class_block_item_list
 	;	
 %%
 
-void yyerror(const char *message){
-    printf("Error: \"%s\" in line %d. Token = %s\n", message, lineno, yytext);
-    exit(1);
+void yyerror ()
+{
+  fprintf(stderr, "Syntax error at line %d\n", lineno);
+  exit(1);
 }
 
 int main(int argc, char *argv[]){
