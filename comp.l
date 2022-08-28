@@ -1,6 +1,6 @@
 %option noyywrap nodefault
 %{
-	#include <stdio.h>
+    #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
     #include "symtab.h"
@@ -9,7 +9,7 @@
     extern FILE *yyout;
     int lineno = 1;
     void yyerror();
-	static void comment(void);
+    static void comment(void);
 %}
 
 WS [ \t\r\f]
@@ -91,7 +91,7 @@ A [a-zA-Z_0-9]
 "0"|{NZ}{D}*          {return I_CONSTANT;}
 {D}+{E}{FS}?          {return F_CONSTANT;}
 {D}*"."{D}+{E}?{FS}?  {return F_CONSTANT;}
-{D}+"."{E}?{FS}?	  {return F_CONSTANT;}
+{D}+"."{E}?{FS}?      {return F_CONSTANT;}
 \"(\\.|[^"\\])*\"     {return STRING_LITERAL;}
 [L]+[A]*              {insert(yytext, strlen(yytext), UNDEF, lineno);return IDENTIFIER;}
 {WS}+                 {/*ignore whitespace*/}
