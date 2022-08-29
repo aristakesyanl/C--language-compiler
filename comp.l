@@ -1,6 +1,6 @@
 %option noyywrap nodefault
 %{
-    #include <stdio.h>
+	#include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
     #include "symtab.h"
@@ -9,7 +9,7 @@
     extern FILE *yyout;
     int lineno = 1;
     void yyerror();
-    static void comment(void);
+	static void comment(void);
 %}
 
 WS [ \t\r\f]
@@ -19,6 +19,8 @@ FS  (f|F|l|L)
 NZ [1-9]
 L [a-zA-Z_]
 A [a-zA-Z_0-9]
+print       [ -~]
+CCONST      (\'{print}\')|(\'\\[nftrbv]\')
 
 %%
 "/*"                 {comment();}
@@ -88,12 +90,14 @@ A [a-zA-Z_0-9]
 ">>="                 {return RIGHT_ASSIGN;}
 "<<"                  {return LEFT_OP;}
 ">>"                  {return RIGHT_OP;}
-"0"|{NZ}{D}*          {return I_CONSTANT;}
-{D}+{E}{FS}?          {return F_CONSTANT;}
-{D}*"."{D}+{E}?{FS}?  {return F_CONSTANT;}
-{D}+"."{E}?{FS}?      {return F_CONSTANT;}
-\"(\\.|[^"\\])*\"     {return STRING_LITERAL;}
-[L]+[A]*              {insert(yytext, strlen(yytext), UNDEF, lineno);return IDENTIFIER;}
+"0"|{NZ}{D}*          {yylval.int_val=atoi(yytext);return I_CONSTANT;}
+{D}+{E}{FS}?          {yylval.double_val=atof(yytext);return F_CONSTANT;}
+{D}*"."{D}+{E}?{FS}?  {yylval.double_val=atof(yytext);return F_CONSTANT;}
+{D}+"."{E}?{FS}?	  {yylval.double_val=atof(yytext);return F_CONSTANT;}
+CCONST                {yylval.char_val=yytext[0];return C_CONSTANT;}
+\"(\\.|[^"\\])*\"     {yylval.string=malloc(yyleng*sizeof(char));strcpy(yylval.string, yytext);return STRING_LITERAL;}
+[L]+[A]*              {insert(yytext, strlen(yytext), UNDEF, lineno);
+                      yylval.symbol=lookup(yytext);return IDENTIFIER;}
 {WS}+                 {/*ignore whitespace*/}
 "\n"                  {lineno++;}
 .                     {yyerror("unrecognized character");}
