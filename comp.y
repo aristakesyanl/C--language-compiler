@@ -1,4 +1,4 @@
-%{
+%%{
 	#include "symtab.c"
 	#include <stdio.h>
 	#include <stdlib.h>
@@ -10,6 +10,14 @@
 	void yyerror();
 %}
 
+%union{
+	char char_val;
+	int int_val;
+	double double_val;
+	char* string;
+	list_t* symbol;
+}
+
 %right '=' MUL_ASSIGN ADD_ASSIGN SUB_ASSIGN DIV_ASSIGN MOD_ASSIGN AND_ASSIGN OR_ASSIGN XOR_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN
 %left OR_OP
 %left AND_OP
@@ -20,8 +28,10 @@
 %left '+' '-'
 %left '*' '/' '%'
 
-%token INT BOOL LONG SHORT LONGLONG FLOAT DOUBLE CHAR VOID
-%token CONST
+%token <int_val> INT BOOL LONG SHORT LONGLONG CHAR
+%token <int_val> CONST
+%token <double_val> FLOAT DOUBLE
+%token VOID
 %token IF ELSE WHILE FOR DO 
 %token EXTERN STATIC
 %token CLASS PUBLIC PRIVATE
@@ -32,7 +42,11 @@
 %token INC_OP DEC_OP
 %token LEFT_OP RIGHT_OP
 %token MUL_ASSIGN ADD_ASSIGN SUB_ASSIGN DIV_ASSIGN MOD_ASSIGN AND_ASSIGN OR_ASSIGN XOR_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN
-%token I_CONSTANT F_CONSTANT STRING_LITERAL IDENTIFIER
+%token <int_val> I_CONSTANT
+%token <double_val> F_CONSTANT
+%token <char_val> C_CONSTANT
+%token <string> STRING_LITERAL
+%token <symbol> IDENTIFIER
 
 %start program
 %%
@@ -68,6 +82,7 @@ primary_expression
 constant
 	:I_CONSTANT
 	|F_CONSTANT
+	|C_CONSTANT
 	;
 
 unary_expression
