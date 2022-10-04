@@ -1,8 +1,8 @@
-run: comp.tab.c lex.yy.c
-	gcc -o compiler comp.tab.c lex.yy.c
+run: parser.tab.c lex.yy.c ast.c
+	gcc -o compiler parser.tab.c lex.yy.c ast.c
 
-comp.tab.c: comp.y
-	bison -d comp.y
+parser.tab.c: parser.y
+	bison -d parser.y
 
-lex.yy.c: comp.l
-	flex comp.l
+lex.yy.c: scanner.l
+	flex scanner.l
