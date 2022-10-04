@@ -61,13 +61,13 @@ CCONST      (\'{print}\')|(\'\\[nftrbv]\')
 "."                   {return DOT;}
 ","                   {return COMMA;}
 "="                   {return ASSIGN;}
-"0"|{NZ}{D}*          {return ICONST;}
-{D}+{E}{FS}?          {return FCONST;}
-{D}*"."{D}+{E}?{FS}?  {return FCONST;}
-{D}+"."{E}?{FS}?      {return FCONST;}
-CCONST                {return CCONST;}
+"0"|{NZ}{D}*          {yylval.int_val=atoi(yytext);return ICONST;}
+{D}+{E}{FS}?          {yylval.int_val=atof(yytext);return FCONST;}
+{D}*"."{D}+{E}?{FS}?  {yylval.int_val=atof(yytext);return FCONST;}
+{D}+"."{E}?{FS}?      {yylval.int_val=atof(yytext);return FCONST;}
+CCONST                {yylval.char_val=yytext[0];return CCONST;}
 \"(\\.|[^"\\])*\"     {return STRING;}
-{L}+{A}*              {return ID;}
+{L}+{A}*              {yylval.name=strdup(yytext);return ID;}
 {WS}+                 {/*ignore whitespace*/}
 "\n"                  {lineno++;}
 .                     {yyerror("unrecognized character");}
