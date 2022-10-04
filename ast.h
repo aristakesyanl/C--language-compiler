@@ -3,7 +3,22 @@ typedef enum{
 	EXPR_SUB,
 	EXPR_MUL,
 	EXPR_DIV,
-	EXPR_VAL
+	EXPR_VAL,
+	EXPR_ASSIGN,
+	EXPR_INC,
+	EXPR_DEC,
+	EXPR_NAME,
+	EXPR_CALL,
+	EXPR_SUBSCRIPT,
+	EXPR_LS,
+	EXPR_GR,
+	EXPR_MOD,
+	EXPR_EQ,
+	EXPR_NOT_EQ,
+	EXPR_AND,
+	EXPR_OR,
+	EXPR_NOT,
+	EXPR_ARG
 }expr_t;
 
 typedef enum{
@@ -13,7 +28,9 @@ typedef enum{
 	STMT_FOR,
 	STMT_WHILE,
 	STMT_BLOCK,
-	STMT_RETURN
+	STMT_RETURN,
+	STMT_BREAK,
+	STMT_CONTINUE
 }stmt_t;
 
 typedef enum{
@@ -33,6 +50,8 @@ struct expr{
 	struct expr* left;
 	struct expr* right;
 	int val;
+	char* name;
+	double dval;
 };
 
 struct decl{
@@ -68,6 +87,9 @@ struct param_list{
 
 struct expr* expr_create(expr_t , struct expr*, struct expr*);
 struct expr* expr_val(int );
+struct expr* expr_dval(double);
+struct expr* expr_name(char*);
+struct expr* expr_subscript(char*);
 int expr_eval(struct expr*);
 void expr_print(struct expr*);
 struct decl* decl_create(char*,struct type*, struct expr*, struct stmt*, struct decl* );
