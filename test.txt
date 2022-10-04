@@ -4,26 +4,11 @@ double x;
 bool h;
 int arr[10];
 
-if(x<10){
-	return;
+int k=56;
+int fnc(){
+    for(i=0; i<10; i++){
+     k=k+12;
+    }
+	return 56;
 }
 
-for(i=0; i<10; i++){
-	
-}
-
-while(b==2*3){
-	b=x+36;
-	b=b*45-12/3;
-	b++;
-}
-
-x=12+13;
-
-int sqrt(int a, int b, bool t){
-	x=x*x;
-	return x;
-
-}
-
-y=sqrt(3);
