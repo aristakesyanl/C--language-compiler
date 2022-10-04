@@ -7,6 +7,8 @@ struct expr* expr_create(expr_t type, struct expr* left, struct expr* right){
 	e->left=left;
 	e->right=right;
 	e->val=0;
+	e->dval=0;
+	e->name=0;
 	return e;
 }
 
@@ -14,6 +16,35 @@ struct expr* expr_val(int val){
 	struct expr* e=expr_create(EXPR_VAL,0,0);
 	e->val=val;
 	return e;
+}
+
+struct expr* expr_dval(double val){
+	struct expr* e=expr_create(EXPR_VAL,0,0);
+	e->dval=val;
+	return e;
+}
+
+struct expr* expr_name(char* name){
+	struct expr* e=malloc(sizeof(*e));
+	e->type=EXPR_NAME;
+	e->left=0;
+	e->right=0;
+	e->val=0;
+	e->dval=0;
+	e->name=name;
+	return e;
+}
+
+struct expr* expr_subscript(char* name){
+	struct expr* e=malloc(sizeof(*e));
+	e->type=EXPR_SUBSCRIPT;
+	e->left=0;
+	e->right=0;
+	e->val=0;
+	e->dval=0;
+	e->name=name;
+	return e;
+
 }
 
 int expr_eval(struct expr* e){
