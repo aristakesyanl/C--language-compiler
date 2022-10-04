@@ -1,0 +1,21 @@
+int a;
+int b;
+double x;
+bool h;
+int arr[10];
+
+if(x<10){
+	return;
+}
+
+for(i=0; i<10; i++){
+	
+}
+
+while(b==2*3){
+	b=x+36;
+	b=b*45-12/3;
+	b++;
+}
+
+x=12+13;
