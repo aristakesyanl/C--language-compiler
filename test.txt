@@ -19,3 +19,11 @@ while(b==2*3){
 }
 
 x=12+13;
+
+int sqrt(int a, int b, bool t){
+	x=x*x;
+	return x;
+
+}
+
+y=sqrt(3);
