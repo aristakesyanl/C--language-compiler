@@ -9,6 +9,8 @@
 	void yyerror();
 %}
 
+
+
 /* token definition */
 %token CHAR INT DOUBLE IF ELSE WHILE FOR CONTINUE BREAK VOID RETURN BOOL
 %token ADD_OP MUL_OP DIV_OP INC_OP OR_OP AND_OP NOT_OP MOD_OP DEC_OP SUB_OP
@@ -26,6 +28,7 @@ program: program general_statements;
 
 general_statements: declarations
  | statements
+ | function_definitions
  ;
  
 
@@ -57,10 +60,14 @@ statement: if_statement
  | for_statement
  | while_statement
  | expression_statement
- | RETURN SEMI
+ | return_statement
  | BREAK SEMI
  | CONTINUE SEMI
  ;
+
+return_statement: RETURN SEMI
+ | RETURN expression SEMI
+ ; 
 
 if_statement: IF LPAREN expression RPAREN block else_part;
 
@@ -82,6 +89,7 @@ else_part: /*empty*/
  ;
 
 expression: variable
+ | function_call
  | LPAREN expression RPAREN
  | sign constant
  | expression LS expression
@@ -105,7 +113,39 @@ constant: ICONST | FCONST | CCONST ;
 
 sign: ADD_OP | SUB_OP | /*empty*/ ;
 
- 
+function_definitions: function_definition function_definitions
+ |/*empty*/
+ ;
+
+function_definition: INT variable LPAREN param_list RPAREN block
+ |DOUBLE variable LPAREN param_list RPAREN block
+ |CHAR variable LPAREN param_list RPAREN block
+ |VOID variable LPAREN param_list RPAREN block
+ |BOOL variable LPAREN param_list RPAREN block
+ ;
+
+param_list: argument_list
+ |/*empty*/
+ ;
+
+argument_list: argument COMMA argument_list
+ |argument
+ ;
+
+argument: INT variable
+ | BOOL variable
+ | CHAR variable
+ | DOUBLE variable
+ ;
+
+function_call: variable LPAREN expression_list RPAREN
+ |variable LPAREN RPAREN
+ ;
+
+expression_list: expression COMMA expression_list
+ | expression
+ ;   
+
 %%
 
 
